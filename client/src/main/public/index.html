@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calculator</title>
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.2.3/css/bulma.css"
+            integrity="sha256-JPJOXvCZ7dfewrTiPV+GJzvdwvrVs3f2jTyMOjLq0aQ="
+            crossorigin="anonymous"
+    >
+</head>
+
+<body>
+
+<section class="hero is-primary">
+    <div class="container">
+        <h1 class="title">Addition</h1>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <form id="calculator-form">
+            <div class="control has-addons has-addons-centered">
+                <input type="text" name="augend" title="augend" class="control input">
+                <span class="control input is-disabled">+</span>
+                <input type="text" name="addend" title="addend" class="control input">
+                <span class="control input is-disabled">=</span>
+                <input disabled type="text" name="summand" title="summand" class="control input is-disabled">
+                <input type="submit" value="Calculate" class="control button is-primary">
+            </div>
+            <div class="control has-addons has-addons-centered">
+                <div class="control select">
+                    <select name="validate" title="validate">
+                        <option value="validate">client-side validation</option>
+                        <option value="">server-side validation only</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script src="/scala-demo-client-jsdeps.js"></script>
+<script src="/scala-demo-client.js"></script>
+<script src="/scala-demo-client-launcher.js"></script>
+
+</body>
+
+</html>
