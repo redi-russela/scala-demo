@@ -5,7 +5,7 @@ import javax.ws.rs._
 import javax.ws.rs.core.PathSegment
 
 import com.redi.scalademo.business.Calculator
-import com.redi.scalademo.infrastructure.MediaType
+import com.redi.scalademo.infrastructure.{MediaType, Server}
 import upickle.Js
 import upickle.Js.Value
 
@@ -17,9 +17,11 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class ApiEndpoint {
 
   import ExecutionContext.Implicits.global
-  import ServerModule.{calculator, server}
 
   val timeout: Duration = 5.seconds
+
+  val server: Server = ServerModule.server
+  val calculator: Calculator = ServerModule.calculator
 
   @POST
   @Consumes(Array(MediaType.Json))
