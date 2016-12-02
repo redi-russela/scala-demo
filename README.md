@@ -16,7 +16,8 @@ shared Scala sources used by both sides.
 Using the same language for the full stack and having shared sources allows us
 in this project allows for both the server-side and client-side to:
 * Use the same exact validation logic,
-* Share the RMI interface.
+* Share the RMI interface,
+* Share dependency injection modules.
 
 ### Key technologies
 
@@ -28,4 +29,5 @@ Client-side:
 
 Shared:
 * [Autowire](https://github.com/lihaoyi/autowire) for RMI
+* [MacWire](https://github.com/adamw/macwire) for dependency injection
 * [ScalaTest](http://www.scalatest.org/) for testing
