@@ -3,7 +3,7 @@ package com.redi.scalademo.business
 import org.scalatest.{Matchers, path}
 
 class NumericStringValidatorTest extends path.FunSpec with Matchers {
-  override def newInstance: path.FunSpecLike = super.newInstance  // Suppresses false IntelliJ IDEA error.
+  override def newInstance: path.FunSpecLike = new NumericStringValidatorTest
 
   describe("NumericStringValidator") {
 

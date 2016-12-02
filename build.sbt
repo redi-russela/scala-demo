@@ -18,7 +18,7 @@ val commonSettings = Seq(
   }
 )
 
-lazy val common = crossProject.in(file("common"))
+lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared"))
     .disablePlugins(AssemblyPlugin)
     .settings(commonSettings: _*)
     .settings(
@@ -37,8 +37,8 @@ lazy val common = crossProject.in(file("common"))
       )
     )
 
-lazy val commonJs = common.js
-lazy val commonJvm = common.jvm
+lazy val sharedJs = shared.js
+lazy val sharedJvm = shared.jvm
 
 lazy val client = (project in file("client"))
     .enablePlugins(ScalaJSPlugin)
@@ -61,7 +61,7 @@ lazy val client = (project in file("client"))
           minified s"$JQueryVersion/jquery.min.js"
       )
     )
-    .dependsOn(commonJs)
+    .dependsOn(sharedJs)
 
 lazy val server = (project in file("server"))
     .enablePlugins(SbtWeb)
@@ -92,6 +92,6 @@ lazy val server = (project in file("server"))
         }
       }
     )
-    .dependsOn(commonJvm)
+    .dependsOn(sharedJvm)
 
 run := (run in server).evaluated
