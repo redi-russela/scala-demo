@@ -94,4 +94,6 @@ lazy val server = (project in file("server"))
     )
     .dependsOn(sharedJvm)
 
+cancelable in Global := true
+
 run := (run in server).evaluated
