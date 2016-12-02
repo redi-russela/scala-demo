@@ -5,6 +5,7 @@ Running
 ------------------------------------------------------------------------------
 
 Run command: `sbt run`
+
 Alternatively, execute the jar file after running `sbt assembly`.
 
 Overview
