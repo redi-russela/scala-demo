@@ -32,12 +32,6 @@ class FormListener(
   private var formElement: JQuery = _
   private var summandElement: JQuery = _
 
-  private var shouldValidate: Boolean = _
-  private var allFormValuesAreValid: Boolean = _
-  private var calculableFormData: js.Array[js.Dictionary[String]] = _
-  private var augend: String = _
-  private var addend: String = _
-
   def attachTo(formId: String): Unit = {
 
     formElement = $(s"form#$formId")
@@ -45,10 +39,11 @@ class FormListener(
 
     formElement.submit { (e: JQueryEventObject) ⇒
       e.preventDefault()
-      init()
-      processValidationFormData()
-      validateAndExtractNumbers()
-      invokeAddition()
+      resetStyles()
+      val allFormValuesAreValid = validateAndSetStyles()
+      if (allFormValuesAreValid) {
+        invokeAddition()
+      }
     }
 
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
@@ -64,27 +59,12 @@ class FormListener(
     s"""[name="$name"]"""
   }
 
-  private def init(): Unit = {
-    shouldValidate = true
-    allFormValuesAreValid = true
-    calculableFormData = js.Array[js.Dictionary[String]]()
-    augend = ""
-    addend = ""
-  }
-
-  private def processValidationFormData(): Unit = {
+  private def resetStyles(): Unit = {
     formElement.find(namedElement).removeClass(DangerClass)
-    val serializedFormData = formElement.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
-    for (formControlData: js.Dictionary[String] ← serializedFormData) {
-      if (formControlData(Name) == Validate) {
-        shouldValidate = formControlData(Value).nonEmpty
-      } else {
-        calculableFormData += formControlData
-      }
-    }
   }
 
-  private def validateAndExtractNumbers(): Unit = {
+  private def validateAndSetStyles(): Boolean = {
+    var allFormValuesAreValid = true
     for (formControlData: js.Dictionary[String] ← calculableFormData) {
       val name: String = formControlData(Name)
       val value: String = formControlData(Value)
@@ -95,34 +75,66 @@ class FormListener(
           formElement.find(elementNamed(name)).addClass(DangerClass)
         }
       }
-      name match {
-        case Augend ⇒
-          augend = value
-        case Addend ⇒
-          addend = value
+    }
+    allFormValuesAreValid
+  }
+
+  private def serializedFormData: js.Array[js.Dictionary[String]] = {
+    formElement.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
+  }
+
+  private def calculableFormData: js.Array[js.Dictionary[String]] = {
+    var calculableFormData = js.Array[js.Dictionary[String]]()
+    for (formControlData: js.Dictionary[String] ← serializedFormData) {
+      if (formControlData(Name) != Validate) {
+        calculableFormData += formControlData
+      }
+    }
+    calculableFormData
+  }
+
+  private def shouldValidate: Boolean = {
+    var shouldValidate = false
+    for (formControlData: js.Dictionary[String] ← serializedFormData) {
+      if (formControlData(Name) == Validate) {
+        shouldValidate &= formControlData(Value).nonEmpty
+      }
+    }
+    shouldValidate
+  }
+
+  private def invokeAddition(): Unit = {
+    val futureResult: Future[ValidatedResult[BigDecimal]] =
+      client[Calculator].add(augend, addend).call()
+    for (result: ValidatedResult[BigDecimal] ← futureResult) {
+      result match {
+        case Left(validationFailures) ⇒
+          for (validationFailure: ValidationFailure ← validationFailures) {
+            formElement
+              .find(elementNamed(validationFailure.formControlName))
+              .addClass(DangerClass)
+          }
+        case Right(summand: BigDecimal) ⇒
+          summandElement
+            .value(summand.toString)
+            .addClass(InfoClass)
       }
     }
   }
 
-  private def invokeAddition(): Unit = {
-    if (allFormValuesAreValid) {
-      val futureResult: Future[ValidatedResult[BigDecimal]] =
-        client[Calculator].add(augend, addend).call()
-      for (result: ValidatedResult[BigDecimal] ← futureResult) {
-        result match {
-          case Left(validationFailures) ⇒
-            for (validationFailure: ValidationFailure ← validationFailures) {
-              formElement
-                .find(elementNamed(validationFailure.formControlName))
-                .addClass(DangerClass)
-            }
-          case Right(summand: BigDecimal) ⇒
-            summandElement
-              .value(summand.toString)
-              .addClass(InfoClass)
-        }
+  private def augend: String = getValueOrBlank(Augend)
+
+  private def addend: String = getValueOrBlank(Addend)
+
+  private def getValueOrBlank(name: String): String = {
+    for (formControlData: js.Dictionary[String] ← calculableFormData) {
+      val currentName: String = formControlData(Name)
+      val currentValue: String = formControlData(Value)
+      if (currentName == name) {
+        return currentValue
       }
     }
+    ""
   }
 
 }
