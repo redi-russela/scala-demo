@@ -1,9 +1,10 @@
 package com.redi.scalademo.presentation
 
 import com.redi.scalademo.business.{Calculator, DefaultCalculator}
-import com.redi.scalademo.infrastructure.Server
+import com.redi.scalademo.infrastructure.{Server, SharedModule}
+import com.softwaremill.macwire.wire
 
-private[presentation] object ServerModule {
-  lazy val calculator: Calculator = new DefaultCalculator
-  lazy val server = new Server
+object ServerModule extends SharedModule {
+  lazy val calculator: Calculator = wire[DefaultCalculator]
+  lazy val server = wire[Server]
 }

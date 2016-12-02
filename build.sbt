@@ -1,9 +1,11 @@
 scalaVersion in ThisBuild := "2.12.0"
 
 val AutowireVersion = "0.2.6"
-val JerseyVersion = "2.24.1"
+val MacWireVersion = "2.2.5"
 val UPickleVersion = "0.4.4"
 val ScalaTestVersion = "3.0.1"
+
+val JerseyVersion = "2.24.1"
 
 val JQueryVersion = "2.2.4"
 
@@ -24,11 +26,15 @@ lazy val common = crossProject.in(file("common"))
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % AutowireVersion,
         "com.lihaoyi" %%% "upickle" % UPickleVersion,
+        "com.softwaremill.macwire" %% "macros" % MacWireVersion % "provided",
         "org.scalatest" %%% "scalatest" % ScalaTestVersion % "test"
       )
     )
     .jvmSettings(
-      libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+      libraryDependencies ++= Seq(
+        "com.softwaremill.macwire" %% "proxy" % MacWireVersion,
+        "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+      )
     )
 
 lazy val commonJs = common.js
@@ -46,6 +52,7 @@ lazy val client = (project in file("client"))
       libraryDependencies ++= Seq(
         "be.doeraene" %%% "scalajs-jquery" % "0.9.1",
         "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+        "com.softwaremill.macwire" %% "macros" % MacWireVersion % "provided",
         "org.scalatest" %%% "scalatest" % ScalaTestVersion % "test"
       ),
       jsDependencies ++= Seq(
@@ -70,6 +77,7 @@ lazy val server = (project in file("server"))
       managedClasspath in Runtime += (packageBin in Assets).value,
       libraryDependencies ++= Seq(
         "org.glassfish.jersey.containers" % "jersey-container-jetty-servlet" % JerseyVersion,
+        "com.softwaremill.macwire" %% "macros" % MacWireVersion % "provided",
         "org.scalatest" %% "scalatest" % ScalaTestVersion % "test"
       ),
       run := {
