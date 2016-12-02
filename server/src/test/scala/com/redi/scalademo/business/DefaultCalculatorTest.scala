@@ -87,7 +87,7 @@ class DefaultCalculatorTest extends path.FunSpec with Matchers {
 
   }
 
-  def createTarget: DefaultCalculator = new DefaultCalculator
+  def createTarget: DefaultCalculator = new DefaultCalculator(new NumericStringValidator)
 
   def failureExists(validatedResult: ValidatedResult[_], formControlName: String): Boolean = {
     validatedResult

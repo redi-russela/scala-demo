@@ -2,10 +2,11 @@ package com.redi.scalademo.business
 
 import scala.collection.mutable.ArrayBuffer
 
-class DefaultCalculator extends Calculator {
+class DefaultCalculator(
+  validator: NumericStringValidator
+) extends Calculator {
 
   override def add(augend: String, addend: String): ValidatedResult[BigDecimal] = {
-    val validator = new NumericStringValidator
     val failures = ArrayBuffer.empty[ValidationFailure]
     if (!validator.isValidNumber(augend)) {
       failures += ValidationFailure("augend", "augend must be a number")
