@@ -9,10 +9,10 @@ class DefaultCalculator(
   override def add(augend: String, addend: String): ValidatedResult[BigDecimal] = {
     val failures = ArrayBuffer.empty[ValidationFailure]
     if (!validator.isValidNumber(augend)) {
-      failures += ValidationFailure("augend", "augend must be a number")
+      failures += ValidationFailure(FormControlNames.Augend, "augend must be a number")
     }
     if (!validator.isValidNumber(addend)) {
-      failures += ValidationFailure("addend", "addend must be a number")
+      failures += ValidationFailure(FormControlNames.Addend, "addend must be a number")
     }
     if (failures.nonEmpty) {
       Left(failures)

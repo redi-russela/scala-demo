@@ -1,7 +1,7 @@
 package com.redi.scalademo.presentation
 
 import autowire.{clientCallable, unwrapClientProxy}
-import com.redi.scalademo.business.{Calculator, NumericStringValidator, ValidatedResult, ValidationFailure}
+import com.redi.scalademo.business._
 import com.redi.scalademo.infrastructure.Client
 import org.scalajs.dom
 import org.scalajs.jquery.{JQuery, JQueryEventObject, jQuery => $}
@@ -30,10 +30,10 @@ class FormListener(
   def attachTo(formId: String): Unit = {
 
     formElement = $(s"form#$formId")
-    augendElement = formElement.find(elementNamed("augend"))
-    addendElement = formElement.find(elementNamed("addend"))
-    summandElement = formElement.find(elementNamed("summand"))
-    clientSideValidationElement = formElement.find(elementNamed("client-side-validation"))
+    augendElement = formElement.find(elementNamed(FormControlNames.Augend))
+    addendElement = formElement.find(elementNamed(FormControlNames.Addend))
+    summandElement = formElement.find(elementNamed(FormControlNames.Summand))
+    clientSideValidationElement = formElement.find(elementNamed(FormControlNames.ClientSideValidation))
 
     formElement.submit { (e: JQueryEventObject) ⇒
       onSubmit(e)
