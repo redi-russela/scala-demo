@@ -17,11 +17,7 @@ class FormListener(
   numericStringValidator: NumericStringValidator
 ) {
 
-  private val InfoClass = "is-info"
-  private val DangerClass = "is-danger"
-
-  private val Name = "name"
-  private val Value = "value"
+  import FormListener._
 
   private val namedElement = "[name]"
 
@@ -129,5 +125,20 @@ class FormListener(
   private def addendValue: String = {
     addendElement.value().toString
   }
+
+}
+
+object FormListener {
+
+  private val InfoClass = "is-info"
+  private val DangerClass = "is-danger"
+
+  private val Validate = "validate"
+  private val Augend = "augend"
+  private val Addend = "addend"
+  private val Summand = "summand"
+
+  private val Name = "name"
+  private val Value = "value"
 
 }
