@@ -12,29 +12,23 @@ import scala.math.BigDecimal
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
-class FormListener(
+class CalculatorFormListener(
   client: Client,
-  numericStringValidator: NumericStringValidator
+  numericStringValidator: NumericStringValidator,
+  formId:String
 ) {
 
-  import FormListener._
+  import CalculatorFormListener._
 
   private val namedElement = "[name]"
 
-  private var formElement: JQuery = _
-  private var summandElement: JQuery = _
-  private var augendElement: JQuery = _
-  private var addendElement: JQuery = _
-  private var clientSideValidationElement: JQuery = _
+  private val formElement: JQuery = $(s"#$formId")
+  private val augendElement: JQuery = formElement.find(elementNamed(FormControlNames.Augend))
+  private val addendElement: JQuery = formElement.find(elementNamed(FormControlNames.Addend))
+  private val summandElement: JQuery = formElement.find(elementNamed(FormControlNames.Summand))
+  private val clientSideValidationElement: JQuery = formElement.find(elementNamed(FormControlNames.ClientSideValidation))
 
-  def attachTo(formId: String): Unit = {
-
-    formElement = $(s"form#$formId")
-    augendElement = formElement.find(elementNamed(FormControlNames.Augend))
-    addendElement = formElement.find(elementNamed(FormControlNames.Addend))
-    summandElement = formElement.find(elementNamed(FormControlNames.Summand))
-    clientSideValidationElement = formElement.find(elementNamed(FormControlNames.ClientSideValidation))
-
+  def startListening(): Unit = {
     formElement.submit { (e: JQueryEventObject) ⇒
       onSubmit(e)
     }
@@ -42,7 +36,6 @@ class FormListener(
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
       onInput(self, e)
     }: js.ThisFunction1[dom.Element, JQueryEventObject, js.Any])
-
   }
 
   private def elementNamed(name: String): String = {
@@ -136,7 +129,7 @@ class FormListener(
 
 }
 
-object FormListener {
+object CalculatorFormListener {
 
   private val InfoClass = "is-info"
   private val DangerClass = "is-danger"
