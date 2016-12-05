@@ -36,34 +36,42 @@ class FormListener(
     clientSideValidationElement = formElement.find(elementNamed("client-side-validation"))
 
     formElement.submit { (e: JQueryEventObject) ⇒
-      e.preventDefault()
-
-      resetValidationErrors()
-
-      if (clientSideValidationEnabled) {
-        val invalidElements: Iterable[JQuery] = getInvalidElements
-        if (invalidElements.nonEmpty) {
-          for (invalidElement <- invalidElements) {
-            addValidationError(invalidElement)
-          }
-          return
-        }
-      }
-
-      invokeAddition()
+      onSubmit(e)
     }
 
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
-      $(self).removeClass(DangerClass)
-      summandElement
-        .value("")
-        .removeClass(InfoClass)
+      onInput(self, e)
     }: js.ThisFunction1[dom.Element, JQueryEventObject, js.Any])
 
   }
 
   private def elementNamed(name: String): String = {
     s"""[name="$name"]"""
+  }
+
+  private def onSubmit(e: JQueryEventObject): Unit = {
+    e.preventDefault()
+
+    resetValidationErrors()
+
+    if (clientSideValidationEnabled) {
+      val invalidElements: Iterable[JQuery] = getInvalidElements
+      if (invalidElements.nonEmpty) {
+        for (invalidElement <- invalidElements) {
+          addValidationError(invalidElement)
+        }
+        return
+      }
+    }
+
+    invokeAddition()
+  }
+
+  private def onInput(self: dom.Element, e: JQueryEventObject): Unit = {
+    $(self).removeClass(DangerClass)
+    summandElement
+      .value("")
+      .removeClass(InfoClass)
   }
 
   private def resetValidationErrors(): Unit = {
@@ -81,8 +89,8 @@ class FormListener(
   private def getInvalidElements: Iterable[JQuery] = {
     val invalidElements = ArrayBuffer.empty[JQuery]
     for (formControlData: js.Dictionary[String] ← calculableFormData) {
-      val name: String = formControlData(Name)
-      val value: String = formControlData(Value)
+      val name: String = formControlData("name")
+      val value: String = formControlData("value")
       val isValid: Boolean = numericStringValidator.isValidNumber(value)
       if (!isValid) {
         invalidElements += formElement.find(elementNamed(name))
@@ -132,13 +140,5 @@ object FormListener {
 
   private val InfoClass = "is-info"
   private val DangerClass = "is-danger"
-
-  private val Validate = "validate"
-  private val Augend = "augend"
-  private val Addend = "addend"
-  private val Summand = "summand"
-
-  private val Name = "name"
-  private val Value = "value"
 
 }
