@@ -14,9 +14,9 @@ class Client extends autowire.Client[Js.Value, Reader, Writer] {
       .post(
         url = "/api/" + request.path.mkString("/"),
         data = upickle.json.write(Js.Obj(request.args.toSeq: _*)),
-        headers = Map(HttpHeaders.ContentType → MediaType.Json)
+        headers = Map(HttpHeaders.ContentType -> MediaType.Json)
       )
-      .map((request: dom.XMLHttpRequest) ⇒ request.responseText)
+      .map((request: dom.XMLHttpRequest) => request.responseText)
       .map(upickle.json.read)
   }
 

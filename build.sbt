@@ -83,9 +83,9 @@ lazy val server = (project in file("server"))
       run := {
         val log: Logger = streams.value.log
         assembly.result.value match {
-          case Inc(_) ⇒
+          case Inc(_) =>
             log.error("Unable to start due to assembly failure.")
-          case Value(_) ⇒
+          case Value(_) =>
             log.info("Starting...")
             val jarLocation: String = (assemblyOutputPath in assembly).value.getCanonicalPath
             s"java -jar $jarLocation".!

@@ -1,6 +1,6 @@
 package com.redi.scalademo.presentation
 
-import java.util.{List ⇒ JavaList}
+import java.util.{List => JavaList}
 import javax.ws.rs._
 import javax.ws.rs.core.PathSegment
 
