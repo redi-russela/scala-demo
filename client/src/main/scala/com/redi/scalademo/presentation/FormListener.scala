@@ -96,14 +96,12 @@ class FormListener(
     invalidElements
   }
 
-  private def serializeFormData(element: JQuery): js.Array[js.Dictionary[String]] = {
-    element.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
+  private def calculableFormData: js.Array[js.Dictionary[String]] = {
+    serializeFormData(augendElement) ++ serializeFormData(addendElement)
   }
 
-  private def calculableFormData: js.Array[js.Dictionary[String]] = {
-    serializeFormData(augendElement) ++
-      serializeFormData(addendElement) ++
-      serializeFormData(summandElement)
+  private def serializeFormData(element: JQuery): js.Array[js.Dictionary[String]] = {
+    element.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
   }
 
   private def invokeAddition(): Unit = {
