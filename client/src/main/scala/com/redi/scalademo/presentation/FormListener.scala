@@ -4,8 +4,9 @@ import autowire.{clientCallable, unwrapClientProxy}
 import com.redi.scalademo.business.{Calculator, NumericStringValidator, ValidatedResult, ValidationFailure}
 import com.redi.scalademo.infrastructure.Client
 import org.scalajs.dom
-import org.scalajs.jquery.{JQuery, JQueryEventObject, jQuery ⇒ $}
+import org.scalajs.jquery.{JQuery, JQueryEventObject, jQuery => $}
 
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.math.BigDecimal
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
@@ -19,11 +20,6 @@ class FormListener(
   private val InfoClass = "is-info"
   private val DangerClass = "is-danger"
 
-  private val Validate = "validate"
-  private val Augend = "augend"
-  private val Addend = "addend"
-  private val Summand = "summand"
-
   private val Name = "name"
   private val Value = "value"
 
@@ -31,19 +27,35 @@ class FormListener(
 
   private var formElement: JQuery = _
   private var summandElement: JQuery = _
+  private var augendElement: JQuery = _
+  private var addendElement: JQuery = _
+  private var clientSideValidationElement: JQuery = _
 
   def attachTo(formId: String): Unit = {
 
     formElement = $(s"form#$formId")
-    summandElement = formElement.find(elementNamed(Summand))
+    augendElement = formElement.find(elementNamed("augend"))
+    addendElement = formElement.find(elementNamed("addend"))
+    summandElement = formElement.find(elementNamed("summand"))
+    clientSideValidationElement = formElement.find(elementNamed("client-side-validation"))
 
     formElement.submit { (e: JQueryEventObject) ⇒
-      e.preventDefault()
-      resetStyles()
-      val allFormValuesAreValid = validateAndSetStyles()
-      if (allFormValuesAreValid) {
+      resetValidationErrors()
+
+      if (clientSideValidationEnabled) {
+        val invalidElements: Iterable[JQuery] = getInvalidElements
+        if (invalidElements.nonEmpty) {
+          for (invalidElement <- invalidElements) {
+            addValidationError(invalidElement)
+          }
+        } else {
+          invokeAddition()
+        }
+      } else {
         invokeAddition()
       }
+
+      e.preventDefault()
     }
 
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
@@ -59,53 +71,44 @@ class FormListener(
     s"""[name="$name"]"""
   }
 
-  private def resetStyles(): Unit = {
+  private def resetValidationErrors(): Unit = {
     formElement.find(namedElement).removeClass(DangerClass)
   }
 
-  private def validateAndSetStyles(): Boolean = {
-    var allFormValuesAreValid = true
+  private def addValidationError(element: JQuery): Unit = {
+    element.addClass(DangerClass)
+  }
+
+  private def clientSideValidationEnabled: Boolean = {
+    clientSideValidationElement.is(":selected")
+  }
+
+  private def getInvalidElements: Iterable[JQuery] = {
+    val invalidElements = ArrayBuffer.empty[JQuery]
     for (formControlData: js.Dictionary[String] ← calculableFormData) {
       val name: String = formControlData(Name)
       val value: String = formControlData(Value)
-      if (shouldValidate) {
-        val isValid: Boolean = numericStringValidator.isValidNumber(value)
-        if (!isValid) {
-          allFormValuesAreValid = false
-          formElement.find(elementNamed(name)).addClass(DangerClass)
-        }
+      val isValid: Boolean = numericStringValidator.isValidNumber(value)
+      if (!isValid) {
+        invalidElements += formElement.find(elementNamed(name))
       }
     }
-    allFormValuesAreValid
+    invalidElements
   }
 
-  private def serializedFormData: js.Array[js.Dictionary[String]] = {
-    formElement.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
+  private def serializeFormData(element: JQuery): js.Array[js.Dictionary[String]] = {
+    element.serializeArray().asInstanceOf[js.Array[js.Dictionary[String]]]
   }
 
   private def calculableFormData: js.Array[js.Dictionary[String]] = {
-    var calculableFormData = js.Array[js.Dictionary[String]]()
-    for (formControlData: js.Dictionary[String] ← serializedFormData) {
-      if (formControlData(Name) != Validate) {
-        calculableFormData += formControlData
-      }
-    }
-    calculableFormData
-  }
-
-  private def shouldValidate: Boolean = {
-    var shouldValidate = false
-    for (formControlData: js.Dictionary[String] ← serializedFormData) {
-      if (formControlData(Name) == Validate) {
-        shouldValidate &= formControlData(Value).nonEmpty
-      }
-    }
-    shouldValidate
+    serializeFormData(augendElement) ++
+      serializeFormData(addendElement) ++
+      serializeFormData(summandElement)
   }
 
   private def invokeAddition(): Unit = {
     val futureResult: Future[ValidatedResult[BigDecimal]] =
-      client[Calculator].add(augend, addend).call()
+      client[Calculator].add(augendValue, addendValue).call()
     for (result: ValidatedResult[BigDecimal] ← futureResult) {
       result match {
         case Left(validationFailures) ⇒
@@ -122,19 +125,12 @@ class FormListener(
     }
   }
 
-  private def augend: String = getValueOrBlank(Augend)
+  private def augendValue: String = {
+    augendElement.value().toString
+  }
 
-  private def addend: String = getValueOrBlank(Addend)
-
-  private def getValueOrBlank(name: String): String = {
-    for (formControlData: js.Dictionary[String] ← calculableFormData) {
-      val currentName: String = formControlData(Name)
-      val currentValue: String = formControlData(Value)
-      if (currentName == name) {
-        return currentValue
-      }
-    }
-    ""
+  private def addendValue: String = {
+    addendElement.value().toString
   }
 
 }
