@@ -40,6 +40,8 @@ class FormListener(
     clientSideValidationElement = formElement.find(elementNamed("client-side-validation"))
 
     formElement.submit { (e: JQueryEventObject) ⇒
+      e.preventDefault()
+
       resetValidationErrors()
 
       if (clientSideValidationEnabled) {
@@ -48,14 +50,11 @@ class FormListener(
           for (invalidElement <- invalidElements) {
             addValidationError(invalidElement)
           }
-        } else {
-          invokeAddition()
+          return
         }
-      } else {
-        invokeAddition()
       }
 
-      e.preventDefault()
+      invokeAddition()
     }
 
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
