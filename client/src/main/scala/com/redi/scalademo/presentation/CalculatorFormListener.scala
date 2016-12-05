@@ -29,11 +29,11 @@ class CalculatorFormListener(
   private val clientSideValidationElement: JQuery = formElement.find(elementNamed(FormControlNames.ClientSideValidation))
 
   def startListening(): Unit = {
-    formElement.submit { (e: JQueryEventObject) ⇒
+    formElement.submit { (e: JQueryEventObject) =>
       onSubmit(e)
     }
 
-    formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) ⇒
+    formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) =>
       onInput(self, e)
     }: js.ThisFunction1[dom.Element, JQueryEventObject, js.Any])
   }
@@ -81,7 +81,7 @@ class CalculatorFormListener(
 
   private def getInvalidElements: Iterable[JQuery] = {
     val invalidElements = ArrayBuffer.empty[JQuery]
-    for (formControlData: js.Dictionary[String] ← calculableFormData) {
+    for (formControlData: js.Dictionary[String] <- calculableFormData) {
       val name: String = formControlData("name")
       val value: String = formControlData("value")
       val isValid: Boolean = numericStringValidator.isValidNumber(value)
@@ -103,15 +103,15 @@ class CalculatorFormListener(
   private def invokeAddition(): Unit = {
     val futureResult: Future[ValidatedResult[BigDecimal]] =
       client[Calculator].add(augendValue, addendValue).call()
-    for (result: ValidatedResult[BigDecimal] ← futureResult) {
+    for (result: ValidatedResult[BigDecimal] <- futureResult) {
       result match {
-        case Left(validationFailures) ⇒
-          for (validationFailure: ValidationFailure ← validationFailures) {
+        case Left(validationFailures) =>
+          for (validationFailure: ValidationFailure <- validationFailures) {
             formElement
               .find(elementNamed(validationFailure.formControlName))
               .addClass(DangerClass)
           }
-        case Right(summand: BigDecimal) ⇒
+        case Right(summand: BigDecimal) =>
           summandElement
             .value(summand.toString)
             .addClass(InfoClass)

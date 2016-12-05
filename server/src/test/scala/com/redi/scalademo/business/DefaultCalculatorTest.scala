@@ -92,8 +92,8 @@ class DefaultCalculatorTest extends path.FunSpec with Matchers {
   def failureExists(validatedResult: ValidatedResult[_], formControlName: String): Boolean = {
     validatedResult
       .swap
-      .exists { (validationFailures: Iterable[ValidationFailure]) ⇒
-        validationFailures.exists { (validationFailure: ValidationFailure) ⇒
+      .exists { (validationFailures: Iterable[ValidationFailure]) =>
+        validationFailures.exists { (validationFailure: ValidationFailure) =>
           validationFailure.formControlName == formControlName
         }
       }
