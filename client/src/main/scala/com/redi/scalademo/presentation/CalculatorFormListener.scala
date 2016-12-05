@@ -26,13 +26,13 @@ class CalculatorFormListener(
   private val augendElement: JQuery = formElement.find(elementNamed(FormControlNames.Augend))
   private val addendElement: JQuery = formElement.find(elementNamed(FormControlNames.Addend))
   private val summandElement: JQuery = formElement.find(elementNamed(FormControlNames.Summand))
-  private val clientSideValidationElement: JQuery = formElement.find(elementNamed(FormControlNames.ClientSideValidation))
+  private val clientSideValidationElement: JQuery =
+    formElement.find(elementNamed(FormControlNames.ClientSideValidation))
 
   def startListening(): Unit = {
     formElement.submit { (e: JQueryEventObject) =>
       onSubmit(e)
     }
-
     formElement.find(namedElement).on("input", { (self: dom.Element, e: JQueryEventObject) =>
       onInput(self, e)
     }: js.ThisFunction1[dom.Element, JQueryEventObject, js.Any])
@@ -44,9 +44,7 @@ class CalculatorFormListener(
 
   private def onSubmit(e: JQueryEventObject): Unit = {
     e.preventDefault()
-
     resetValidationErrors()
-
     if (clientSideValidationEnabled) {
       val invalidElements: Iterable[JQuery] = getInvalidElements
       if (invalidElements.nonEmpty) {
@@ -56,7 +54,6 @@ class CalculatorFormListener(
         return
       }
     }
-
     invokeAddition()
   }
 
