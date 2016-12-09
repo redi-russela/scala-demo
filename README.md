@@ -17,8 +17,9 @@ shared Scala sources used by both sides.
 Using the same language for the full stack and having shared sources allows us
 in this project allows for both the server-side and client-side to:
 * Use the same exact validation logic,
-* Share the RMI interface,
-* Share dependency injection modules.
+* Share the remote method invocation (RMI) interface,
+* Share dependency injection modules,
+* Share models and constants.
 
 ### Key technologies
 
