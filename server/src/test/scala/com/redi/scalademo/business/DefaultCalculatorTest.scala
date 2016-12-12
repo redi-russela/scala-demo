@@ -78,7 +78,7 @@ class DefaultCalculatorTest extends path.FunSpec with Matchers {
         }
 
         it("returns the sum") {
-          result.contains(BigDecimal(3)) should be (true)
+          result.merge should be (BigDecimal(3))
         }
 
       }
